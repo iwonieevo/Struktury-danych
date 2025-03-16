@@ -98,6 +98,7 @@ class DoublyLinkedList : public List {
             Node(int value) : prev(nullptr), data(value), next(nullptr) {}
         };
 
+        size_t size;
         Node* head;
         Node* tail;
 };

@@ -6,9 +6,11 @@ ArrayList::ArrayList() : size(0), capacity(2) {
 }
 
 ArrayList::ArrayList(size_t init_capacity) : size(0), capacity(init_capacity) {
+    // capacity should never be 0, especially when chosen resizing startegy is capacity *= 2
     if(init_capacity < 1) {
         capacity = 1;
     }
+
     array = new int[capacity];
 }
 
@@ -17,25 +19,31 @@ ArrayList::~ArrayList() {
 }
 
 void ArrayList::resize(size_t new_capacity) {
+    // create new instance of int[] (with changed capacity)
     int* new_array = new int[new_capacity];
 
+    // rewrite data from the old array to the new one
     for(size_t i = 0; i < size; i++) {
         new_array[i] = array[i];
     }
 
-    delete[] array; // free-up the memory of the old array (before resizing)
+    // free up memory taken by old array
+    delete[] array;
     array = new_array;
     capacity = new_capacity;
 }
 
 void ArrayList::show(void) {
-    for(size_t i = 0; i < size; i++) {
-        std::cout << "i = " << i << "; value = " << array[i] << std::endl;
+    std::cout << "[" << array[0];
+    for(size_t i = 1; i < size; i++) {
+        std::cout << ", " << array[i];
     }
-    std::cout << std::endl;
+
+    std::cout << "]" << std::endl;
 }
 
 void ArrayList::append(int value) {
+    // double the capacity if at limit
     if(size == capacity) {
         resize(capacity*2);
     }
@@ -49,6 +57,7 @@ void ArrayList::prepend(int value) {
         resize(capacity*2);
     }
 
+    // move all of data one place to the right
     for(size_t i = size; i > 0; i--) {
         array[i] = array[i-1];
     }
@@ -57,17 +66,19 @@ void ArrayList::prepend(int value) {
     size++;
 }
 
-// Note: it is impossible to insert element at index that doesn't exist
 void ArrayList::insert(int value, size_t index) {
-    if(index >= size) {
+    // note: for size=0, only index=0 passes this check
+    if(index > size && index) {
         std::cout << "\nIndex=" << index << " is out of bounds.\n";
         return;
     }
 
+    // double the capacity if at limit
     if(size == capacity) {
         resize(capacity*2);
     }
 
+    // move all of data to the right of chosen index one place to the right
     for(size_t i = size; i > index; i--) {
         array[i] = array[i-1];
     }
@@ -82,7 +93,9 @@ int ArrayList::pop_front(void) {
         return 0;
     }
 
+    // save removed value to a temporary variable (for returning purposes)
     int temp = array[0];
+    // move all of data one place to the left (overwriting array[0])
     for(size_t i = 0; i < size; i++) {
         array[i] = array[i+1];
     }
@@ -98,7 +111,9 @@ int ArrayList::pop_back(void) {
     }
 
     size--;
-    return array[size];
+    // save removed value to a temporary variable (for returning purposes)
+    int temp = array[size];
+    return temp;
 }
 
 int ArrayList::remove(size_t index) {
@@ -112,7 +127,9 @@ int ArrayList::remove(size_t index) {
         return 0;
     }
 
+    // save removed value to a temporary variable (for returning purposes)
     int temp = array[index];
+    // move all data to the right of chosen index one place to the left (overwriting array[i])
     for(size_t i = index; i < size; i++) {
         array[i] = array[i+1];
     }
@@ -121,18 +138,21 @@ int ArrayList::remove(size_t index) {
     return temp;
 }
 
-// check both ends at once and go towards the middle
 bool ArrayList::search(int value) {
+    // 2 "pointers" at both ends of the array moving towards the middle
     for(size_t i = 0; i <= size / 2; i++) {
         if(size == 0) {
             return false;
         }
+
         if(array[i] == value) {
             return true;
         }
+
         else if(array[size-1-i] == value != 0){
             return true;
         }
     }
+
     return false;
 }
