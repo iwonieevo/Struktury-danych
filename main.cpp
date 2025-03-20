@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <filesystem>
 
 // Function loading data into List
 void load_from_file(const std::string& source_path, List& list) {
@@ -32,30 +33,43 @@ unsigned long long measure_time(List* list, ReturnType (List::*method)(Parameter
 
 int main(){
     List* test;
-    size_t THE_LEAST = 5000;
-    size_t THE_MOST = 100000;
-    size_t STEP = 5000;
-    size_t NUM_OF_TIMES = 25;
+    std::string path;
+    
+    unsigned int MAX_NUM_OF_VALUES = 100000;
+    unsigned int NUM_OF_STEPS = 20;
+    unsigned int NUM_OF_TIMES = 50;
+
     unsigned long long results[3][7] = {{0, 0, 0, 0, 0, 0, 0},    // ArrayList - append, prepend, insert, pop_front, pop_back, remove, search
                                         {0, 0, 0, 0, 0, 0, 0},    // SinglyLinkedList - append, prepend, insert, pop_front, pop_back, remove, search
                                         {0, 0, 0, 0, 0, 0, 0}};   // DoublyLinkedList - append, prepend, insert, pop_front, pop_back, remove, search
-    std::ofstream file1("Lists/_append.txt"), 
-                  file2("Lists/_prepend.txt"), 
-                  file3("Lists/_insert.txt"), 
-                  file4("Lists/_pop_front.txt"), 
-                  file5("Lists/_pop_back.txt"), 
-                  file6("Lists/_remove.txt"), 
-                  file7("Lists/_search.txt");
+    // Opening output files
+    std::ofstream files[7];
+    std::string filenames[7] = {"Lists/results/append.txt", 
+                                "Lists/results/prepend.txt", 
+                                "Lists/results/insert.txt", 
+                                "Lists/results/pop_front.txt", 
+                                "Lists/results/pop_back.txt", 
+                                "Lists/results/remove.txt", 
+                                "Lists/results/search.txt"
+                                };
+    for(int i = 0; i < 7; i++) {
+        files[i].open(filenames[i]);
+        if(!files[i]) {
+            std::cerr << "Error opening " << filenames[i] << std::endl;
+        }
+    }
     
-    for(size_t i = THE_LEAST; i <= THE_MOST; i += STEP) {
-        for(size_t j = 1; j <= NUM_OF_TIMES; j++) { 
-            std::string path = "data/random_data-" + std::to_string(i) + "-#" + std::to_string(j) + ".txt";
-            generate_random_integers(path, -10000, 10000, i);
+    for(unsigned int i = MAX_NUM_OF_VALUES / NUM_OF_STEPS; i <= MAX_NUM_OF_VALUES; i += MAX_NUM_OF_VALUES / NUM_OF_STEPS) {
+        for(unsigned int j = 1; j <= NUM_OF_TIMES; j++) { 
+            path = "data/random_data-" + std::to_string(i) + "-#" + std::to_string(j) + ".txt";
+            if (!std::filesystem::exists(path)) {
+                generate_random_integers(path, -10000, 10000, i);
+            }
             
             // append - ArrayList
             test = new ArrayList(i);
             load_from_file(path, *test);
-            results[0][0] += measure_time(test, List::prepend, 10001);
+            results[0][0] += measure_time(test, List::append, 10001);
             delete test;
             
             // TODO: dokończyć dla pozostałych operacji i SD, pesymistyczne/średnie przypadki (więc ArrayList zawsze na limicie, insert i remove w środku raczej gdzieś, search taki że nie ma na pewno takiego elementu)
@@ -83,23 +97,23 @@ int main(){
             // remove - DoublyLinkedList
             // search - DoublyLinkedList
         }
-    
-    //       size        ArrayList                                SinglyLinkedList                         DoublyLinkedList
-    file1 << i << " " << (results[0][0] / NUM_OF_TIMES) << " " << (results[1][0] / NUM_OF_TIMES) << " " << (results[2][0] / NUM_OF_TIMES) << std::endl;
-    file2 << i << " " << (results[0][1] / NUM_OF_TIMES) << " " << (results[1][1] / NUM_OF_TIMES) << " " << (results[2][1] / NUM_OF_TIMES) << std::endl;
-    file3 << i << " " << (results[0][2] / NUM_OF_TIMES) << " " << (results[1][2] / NUM_OF_TIMES) << " " << (results[2][2] / NUM_OF_TIMES) << std::endl;
-    file4 << i << " " << (results[0][3] / NUM_OF_TIMES) << " " << (results[1][3] / NUM_OF_TIMES) << " " << (results[2][3] / NUM_OF_TIMES) << std::endl;
-    file5 << i << " " << (results[0][4] / NUM_OF_TIMES) << " " << (results[1][4] / NUM_OF_TIMES) << " " << (results[2][4] / NUM_OF_TIMES) << std::endl;
-    file6 << i << " " << (results[0][5] / NUM_OF_TIMES) << " " << (results[1][5] / NUM_OF_TIMES) << " " << (results[2][5] / NUM_OF_TIMES) << std::endl;
-    file7 << i << " " << (results[0][6] / NUM_OF_TIMES) << " " << (results[1][6] / NUM_OF_TIMES) << " " << (results[2][6] / NUM_OF_TIMES) << std::endl;
+        
+        // Saving mean times to output files
+        std::cout << "Saving output for size=" << i << "..." << std::endl;
+        for(int k = 0; k < 7; k++) {
+            files[k] << i;
+            for(int m = 0; m < 3; m++) {
+                files[k] << ";" << (results[m][k] / NUM_OF_TIMES);
+                results[m][k] = 0;
+            }
+            files[k] << std::endl;
+        }
     }
 
-    file1.close();
-    file2.close();
-    file3.close();
-    file4.close();
-    file5.close();
-    file6.close();
-    file7.close();
+    // Closing output files
+    for(int i = 0; i < 7; i++) {
+        files[i].close();
+    }
+
     return 0;
 }

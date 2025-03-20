@@ -23,10 +23,8 @@ void ArrayList::resize(size_t new_capacity) {
     // create new instance of int[] (with changed capacity)
     int* new_array = new int[new_capacity];
 
-    // rewrite data from the old array to the new one
-    for(size_t i = 0; i < size; i++) {
-        new_array[i] = array[i];
-    }
+    // copy data from the old array to the new one
+    std::memcpy(new_array, array, size * sizeof(int));
 
     // free up memory taken by old array
     delete[] array;
