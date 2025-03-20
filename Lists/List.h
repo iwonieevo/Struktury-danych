@@ -5,6 +5,8 @@
 class List {
     public:
         virtual void show(void) = 0; // display the values inside the List
+        virtual size_t get_size(void) const = 0; // returns size value
+        virtual int get_element(size_t index) const = 0; // returns element on the given index
 
         virtual void append(int value) = 0; // add item at the end
         virtual void prepend(int value) = 0; // add item at the beginning
@@ -22,6 +24,8 @@ class List {
 class ArrayList : public List {
     public:
         virtual void show(void) override;
+        virtual size_t get_size(void) const override;
+        virtual int get_element(size_t index) const override;
 
         virtual void append(int value) override;
         virtual void prepend(int value) override;
@@ -47,6 +51,8 @@ class ArrayList : public List {
 class SinglyLinkedList : public List {
 public:
     virtual void show(void) override;
+    virtual size_t get_size(void) const override;
+    virtual int get_element(size_t index) const override;
 
     virtual void append(int value) override;
     virtual void prepend(int value) override;
@@ -76,6 +82,8 @@ private:
 class DoublyLinkedList : public List {
     public:
         virtual void show(void) override;
+        virtual size_t get_size(void) const override;
+        virtual int get_element(size_t index) const override;
 
         virtual void append(int value) override;
         virtual void prepend(int value) override;

@@ -23,6 +23,34 @@ void DoublyLinkedList::show(void) {
     std::cout << std::endl;
 }
 
+size_t DoublyLinkedList::get_size(void) const {
+    return size;
+}
+
+int DoublyLinkedList::get_element(size_t index) const {
+    if(index >= size) {
+        std::cout << "\nIndex=" << index << " is out of bounds.\n";
+        return 0;
+    }
+    
+    Node* temp;
+    if(index >= size/2) {
+        temp = tail;
+        for(size_t i = size - 1; i > index; i--) {
+            temp = temp->prev;
+        }
+    }
+
+    else {
+        temp = head;
+        for(size_t i = 0; i < index; i++) {
+            temp = temp->next;
+        }
+    }
+
+    return temp->data;
+}
+
 void DoublyLinkedList::append(int value) {
     Node* newNode = new Node(value);
     // if the List is empty => head=nullptr => added Node is the head
@@ -57,7 +85,6 @@ void DoublyLinkedList::prepend(int value) {
     size++;
 }
 
-// Index = how many elements after (so index=0 is the same as first element)
 void DoublyLinkedList::insert(int value, size_t index) {
     // note: for size=0, only index=0 passes this check
     if(index > size && index) {
@@ -149,7 +176,6 @@ int DoublyLinkedList::pop_back(void) {
     return temp_v;
 }
 
-// Index = how many elements after (so index=0 is the same as first element)
 int DoublyLinkedList::remove(size_t index) {
     if(index >= size) {
         std::cout << "\nIndex=" << index << " is out of bounds.\n";

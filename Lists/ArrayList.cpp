@@ -1,5 +1,6 @@
 #include "List.h"
 #include <iostream>
+#include <cstring>
 
 ArrayList::ArrayList() : size(0), capacity(2) {
     array = new int[capacity];
@@ -40,6 +41,18 @@ void ArrayList::show(void) {
     }
 
     std::cout << "]" << std::endl;
+}
+
+size_t ArrayList::get_size(void) const {
+    return size;
+}
+
+int ArrayList::get_element(size_t index) const {
+    if(index >= size) {
+        std::cout << "\nIndex=" << index << " is out of bounds.\n";
+        return 0;
+    }
+    return array[index];
 }
 
 void ArrayList::append(int value) {

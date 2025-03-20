@@ -23,6 +23,28 @@ void SinglyLinkedList::show(void) {
     std::cout << "->\n";
 }
 
+size_t SinglyLinkedList::get_size(void) const {
+    return size;
+}
+
+int SinglyLinkedList::get_element(size_t index) const {
+    if(index >= size) {
+        std::cout << "\nIndex=" << index << " is out of bounds.\n";
+        return 0;
+    }
+    
+    if(index == size - 1) {
+        return tail->data;
+    }
+
+    Node* temp = head;
+    for(size_t i = 0; i < index; i++) {
+        temp = temp->next;
+    }
+
+    return temp->data;
+}
+
 void SinglyLinkedList::append(int value) {
     Node* newNode = new Node(value);
     // if the List is empty => head=nullptr => added Node is the head
@@ -55,7 +77,6 @@ void SinglyLinkedList::prepend(int value) {
     size++;
 }
 
-// Index = how many elements after (so index=0 is the same as first element)
 void SinglyLinkedList::insert(int value, size_t index) {
     // note: for size=0, only index=0 passes this check
     if(index > size && index) {
@@ -141,7 +162,6 @@ int SinglyLinkedList::pop_back(void) {
     return temp_v;
 }
 
-// Index = how many elements after (so index=0 is the same as first element)
 int SinglyLinkedList::remove(size_t index) {
     if(index >= size) {
         std::cout << "\nIndex=" << index << " is out of bounds.\n";
