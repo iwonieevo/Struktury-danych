@@ -13,7 +13,6 @@ void generate_random_integers(std::string& dest_path, int min, int max, size_t n
         return;
     }
     
-    std::cout << "Successfuly opened the file: " << dest_path << std::endl;
     for(size_t i = 0; i < n_rows; i++){
         file << dist(gen) << "\n";
     }
