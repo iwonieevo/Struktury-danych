@@ -1,14 +1,14 @@
-#pragma once
-#include "../data_generation/random_data.h"
-#include "List.h"
+#include "../headers/lists_main.h"
+#include "../../data_generation/random_data.h"
+#include "../headers/ArrayList.h"
+#include "../headers/SinglyLinkedList.h"
+#include "../headers/DoublyLinkedList.h"
 #include <fstream>
 #include <iostream>
-#include <string>
 #include <chrono>
 #include <filesystem>
-#include <cstdint> // uint8_t
 #include <cstdio>  // remove()
-#include <initializer_list>
+#include <cstddef> // size_t
 
 // Function loading data into List
 void load_from_file(const std::string& source_path, List& list) {

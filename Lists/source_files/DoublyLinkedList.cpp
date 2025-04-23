@@ -1,4 +1,4 @@
-#include "List.h"
+#include "../headers/DoublyLinkedList.h"
 #include <iostream>
 
 DoublyLinkedList::DoublyLinkedList() : head(nullptr), tail(nullptr), size(0) {}
