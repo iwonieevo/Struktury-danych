@@ -1,6 +1,4 @@
 #include "../headers/ArrayList.h"
-#include <iostream>
-#include <cstring>
 
 ArrayList::ArrayList() : size(0), capacity(2) {
     array = new int[capacity];

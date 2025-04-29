@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <cstddef> // size_t
 
 // Virtual interface for DS's from Project 1

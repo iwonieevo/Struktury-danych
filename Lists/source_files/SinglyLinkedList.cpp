@@ -1,5 +1,4 @@
 #include "../headers/SinglyLinkedList.h"
-#include <iostream>
 
 SinglyLinkedList::SinglyLinkedList() : head(nullptr), tail(nullptr), size(0) {}
 

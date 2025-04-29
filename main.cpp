@@ -1,4 +1,5 @@
 #include "Lists/headers/lists_main.h"
+#include "PriorityQueues/headers/priority_queues_main.h"
 #include <iostream>
 
 int main() {

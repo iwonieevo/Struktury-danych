@@ -1,14 +1,4 @@
 #include "../headers/lists_main.h"
-#include "../../data_generation/random_data.h"
-#include "../headers/ArrayList.h"
-#include "../headers/SinglyLinkedList.h"
-#include "../headers/DoublyLinkedList.h"
-#include <fstream>
-#include <iostream>
-#include <chrono>
-#include <filesystem>
-#include <cstdio>  // remove()
-#include <cstddef> // size_t
 
 // Function loading data into List
 void load_from_file(const std::string& source_path, List& list) {
@@ -23,16 +13,6 @@ void load_from_file(const std::string& source_path, List& list) {
         list.append(value);
     }
     file.close();
-}
-
-// Function that times method execution
-template <typename ReturnType, typename... Parameters>
-unsigned long long measure_time(List* list, ReturnType (List::*method)(Parameters...), Parameters... params) {
-    auto start = std::chrono::high_resolution_clock::now(); // start tracking time
-    (list->*method)(params...);
-    auto end = std::chrono::high_resolution_clock::now(); // stop tracking time
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    return duration.count();
 }
 
 int lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) {

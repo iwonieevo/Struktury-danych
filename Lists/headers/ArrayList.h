@@ -1,5 +1,6 @@
 #pragma once
 #include "List.h"
+#include <cstring> // memcpy
 
 class ArrayList : public List {
     public:
