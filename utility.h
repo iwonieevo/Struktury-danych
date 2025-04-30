@@ -28,7 +28,17 @@ void generate_random_integers(std::string& dest_path, IntegralType min, Integral
     file.close();
 };
 
-// Function that times method execution
+// Function that times method execution - const params
+template <typename ObjectType, typename ReturnType, typename... Parameters>
+unsigned long long measure_time(ObjectType* object, ReturnType (ObjectType::*method)(Parameters...) const, Parameters... params) {
+    auto start = std::chrono::high_resolution_clock::now(); // start tracking time
+    (object->*method)(params...);
+    auto end = std::chrono::high_resolution_clock::now(); // stop tracking time
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    return duration.count();
+}
+
+// Function that times method execution - non-const params
 template <typename ObjectType, typename ReturnType, typename... Parameters>
 unsigned long long measure_time(ObjectType* object, ReturnType (ObjectType::*method)(Parameters...), Parameters... params) {
     auto start = std::chrono::high_resolution_clock::now(); // start tracking time

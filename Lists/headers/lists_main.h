@@ -16,4 +16,4 @@
 // Function loading data into List
 void load_from_file(const std::string& source_path, List& list);
 
-int lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES);
+void lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES);

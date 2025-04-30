@@ -15,7 +15,8 @@ void load_from_file(const std::string& source_path, List& list) {
     file.close();
 }
 
-int lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) {
+void lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) {
+    std::cout << "Lists main function executing...\n\n";
     List* test;
     std::string path = "temp_file.txt";
     
@@ -32,20 +33,20 @@ int lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) 
                                                                      {0, 0, 0, 0, 0, 0, 0}};   // DoublyLinkedList - append, prepend, insert, pop_front, pop_back, remove, search
     // Opening output files
     std::ofstream files[LIST_METHOD_COUNT];
-    std::string filenames[LIST_METHOD_COUNT] = {"Lists/results/append.txt", 
-                                                "Lists/results/prepend.txt", 
-                                                "Lists/results/insert.txt", 
-                                                "Lists/results/pop_front.txt", 
-                                                "Lists/results/pop_back.txt", 
-                                                "Lists/results/remove.txt", 
-                                                "Lists/results/search.txt"
+    std::string filenames[LIST_METHOD_COUNT] = {"Lists/results/append.csv", 
+                                                "Lists/results/prepend.csv", 
+                                                "Lists/results/insert.csv", 
+                                                "Lists/results/pop_front.csv", 
+                                                "Lists/results/pop_back.csv", 
+                                                "Lists/results/remove.csv", 
+                                                "Lists/results/search.csv"
                                             };
     for(uint8_t i = 0; i < LIST_METHOD_COUNT; i++) {
         files[i].open(filenames[i]);
         if(!files[i]) {std::cerr << "Error opening " << filenames[i] << std::endl;}
     }
 
-    for(uint8_t i = 0; i < LIST_METHOD_COUNT; i++) {files[i] << "SIZE;ArrayList;ArrayList - max;SinglyLinkedList;SinglyLinkedList - max;DoublyLinkedList;DoublyLinkedList - max";}
+    for(uint8_t i = 0; i < LIST_METHOD_COUNT; i++) {files[i] << "SIZE;ArrayList;ArrayList - max;SinglyLinkedList;SinglyLinkedList - max;DoublyLinkedList;DoublyLinkedList - max" << std::endl;}
     
     for(unsigned int SIZE : SIZES) {
         std::cout << "SIZE=" << SIZE << std::endl;
@@ -238,5 +239,4 @@ int lists_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) 
 
     // Removing temp file
     if (remove(path.c_str()) != 0) {perror("Error deleting file");}
-    return 0;
 }
