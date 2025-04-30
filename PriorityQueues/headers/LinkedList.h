@@ -1,6 +1,5 @@
 #pragma once
 #include "PriorityQueue.h"
-#include <stdexcept>
 
 class LinkedList : public PriorityQueue {
 private:
@@ -24,4 +23,6 @@ public:
     const int& find_max(void) const override;
     void modify_key(int e, unsigned int new_priority) override;
     size_t return_size(void) const override;
+
+    PriorityQueue* clone(void) const override;
 };

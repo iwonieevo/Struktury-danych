@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef> // size_t
+#include <stdexcept>
 
 class PriorityQueue {
 public:
@@ -17,6 +18,9 @@ public:
 
     // Return number of elements in queue
     virtual size_t return_size(void) const = 0;
+
+    // Deep copy
+    virtual PriorityQueue* clone(void) const = 0;
 
     virtual ~PriorityQueue() {}
 };

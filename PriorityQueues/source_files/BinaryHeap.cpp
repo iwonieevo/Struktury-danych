@@ -9,6 +9,15 @@ BinaryHeap::~BinaryHeap() {
     delete[] heap;
 }
 
+PriorityQueue* BinaryHeap::clone() const {
+    BinaryHeap* copy = new BinaryHeap(capacity);
+    copy->size = size;
+    for (size_t i = 0; i < size; i++) {
+        copy->heap[i] = heap[i];
+    }
+    return copy;
+}
+
 void BinaryHeap::resize() {
     capacity *= 2;
     if(capacity == 0) {capacity = 1;}
