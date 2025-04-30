@@ -47,13 +47,21 @@ void priority_queues_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM
     for(unsigned int SIZE : SIZES) {
         std::cout << "SIZE=" << SIZE << std::endl;
         for(uint8_t i = 1; i <= NUM_OF_TIMES; i++) {
-            generate_random_integers(keys_path, (unsigned int)0, SIZE*10, SIZE);
-            generate_random_integers(values_path, -100000, 100000, SIZE);
+            // generating files with keys and values, while assuring that there will be two unique Nodes: (e=-100001, p=0) and (e=100001, p=SIZE*10+1) -> This way we know the biggest and the smallest priority elements beforehand.
+            std::ofstream expand_file;
+            generate_random_integers(keys_path, (unsigned int)0, SIZE*10, SIZE-2);
+            expand_file.open(keys_path, std::ios::app);
+            expand_file << 0 << std::endl << SIZE*10+1 << std::endl;
+            expand_file.close();
+            generate_random_integers(values_path, -100000, 100000, SIZE-2);
+            expand_file.open(values_path, std::ios::app);
+            expand_file << -100001 << std::endl << 100001 << std::endl;
+            expand_file.close();
 
             // PairingHeap - insert
             test = new BinaryHeap();
             load_from_file(keys_path, values_path, *test);
-            results[BINARY_HEAP][INSERT] += measure_time(test, &PriorityQueue::insert, 100001, SIZE*5);
+            results[BINARY_HEAP][INSERT] += measure_time(test, &PriorityQueue::insert, 100002, SIZE*10+2); // inserting element with the new highest priority
             delete test;
 
             // PairingHeap - extract_max
@@ -68,16 +76,16 @@ void priority_queues_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM
             results[BINARY_HEAP][FIND_MAX] += measure_time(test, &PriorityQueue::find_max);
             delete test;
 
-            // PairingHeap - modify_key (modifying max element - increase key)
+            // PairingHeap - modify_key (increase key)
             test = new BinaryHeap();
             load_from_file(keys_path, values_path, *test);
-            results[BINARY_HEAP][INCREASE_KEY] += measure_time(test, &PriorityQueue::modify_key, test->find_max(), SIZE*10+1);
+            results[BINARY_HEAP][INCREASE_KEY] += measure_time(test, &PriorityQueue::modify_key, -100001, SIZE*10+2); // modifying key of element with the lowest priority to the new highest priority
             delete test;
 
-            // PairingHeap - modify_key (modifying max element - decrease key)
+            // PairingHeap - modify_key (decrease key)
             test = new BinaryHeap();
             load_from_file(keys_path, values_path, *test);
-            results[BINARY_HEAP][DECREASE_KEY] += measure_time(test, &PriorityQueue::modify_key, test->find_max(), (unsigned int)0);
+            results[BINARY_HEAP][DECREASE_KEY] += measure_time(test, &PriorityQueue::modify_key, 100001, (unsigned int)0); // modifying key of element with the highest priority to the lowest priority
             delete test;
 
             // PairingHeap - return_size
@@ -106,7 +114,7 @@ void priority_queues_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM
     // Closing output files
     for(uint8_t i = 0; i < PQ_METHOD_COUNT; i++) {files[i].close();}
 
-    // Removing temp file
+    // Removing temp files
     if (remove(keys_path.c_str()) != 0) {perror("Error deleting file");}
     if (remove(values_path.c_str()) != 0) {perror("Error deleting file");}
 }
