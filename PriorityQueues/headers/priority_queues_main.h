@@ -12,7 +12,7 @@
 #include <cstdint> // uint8_t
 #include <initializer_list>
 
-// Function loading data into List
-void load_from_file(const std::string& keys_path, std::string& values_path, PriorityQueue& queue);
+// Function loading data into Priority Queue
+void load_from_file(const std::string& keys_path, const std::string& values_path, PriorityQueue& queue);
 
 void priority_queues_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES);
