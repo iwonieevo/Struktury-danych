@@ -8,7 +8,7 @@
 
 // Generates a .txt file containing randomly generated integers
 template <typename IntegralType>
-void generate_random_integers(std::string& dest_path, IntegralType min, IntegralType max, size_t n_rows){
+void generate_random_integers(std::string& dest_path, IntegralType min, IntegralType max, size_t n_rows) {
     if constexpr (!std::is_integral_v<IntegralType>) {
         std::cerr << "Error: generate_random_integers only supports integral types.\n";
         return;
@@ -37,4 +37,10 @@ unsigned long long measure_time(ObjectType* object, MethodType method, Parameter
     auto end = std::chrono::steady_clock::now(); // stop tracking time
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
     return duration.count();
+}
+
+// Self-implemented max function
+template <typename T>
+T max(T a, T b) {
+    return (a > b) ? a : b;
 }
