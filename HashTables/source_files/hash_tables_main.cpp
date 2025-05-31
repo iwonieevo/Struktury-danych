@@ -1,36 +1,65 @@
 #include "../headers/hash_tables_main.h"
 
-void load_from_file(const std::string& path, HashTable& dict) {
-    std::ifstream data(path);
-    if(!data.is_open()) {
-        std::cerr << "Error: couldn't open the file: " << path << std::endl;
+void generate_keys(std::string& dest_path, std::string& values_path) {
+    std::ifstream values(values_path);
+    if(!values.is_open()) {
+        std::cerr << "Error: couldn't open the file: " << values_path << std::endl;
         return;
     }
-
+    std::ofstream keys(dest_path);
+    if(!keys.is_open()) {
+        std::cerr << "Error: couldn't open the file: " << dest_path << std::endl;
+        return;
+    }
+    
     std::random_device rd; // random seed
     std::mt19937 gen(rd()); // generator
     std::uniform_int_distribution<char> dist('a', 'z');
 
     int value;
     std::string key;
-    while(data >> value) {
+    while(values >> value) {
         key = "";
         for(uint8_t i = 0; i < 10; i++) {
             key.push_back(dist(gen));
         }
         key.append(std::to_string(value));
+        keys << key;
+    }
+    values.close();
+    keys.close();
+}
+
+void load_from_file(const std::string& k_path, const std::string& v_path, HashTable& dict) {
+    std::ifstream values(v_path);
+    if(!values.is_open()) {
+        std::cerr << "Error: couldn't open the file: " << v_path << std::endl;
+        return;
+    }
+    std::ifstream keys(k_path);
+    if(!keys.is_open()) {
+        std::cerr << "Error: couldn't open the file: " << k_path << std::endl;
+        return;
+    }
+
+    int value;
+    std::string key;
+    while(keys >> key && values >> value) {
         dict.insert(key, value);
     }
-    data.close();
+    values.close();
+    keys.close();
 }
 
 void unit_tests(uint8_t bucket_type) {
     HashTable *test;
-    std::string data_path = "temp.txt";
-    generate_random_integers(data_path, -100, 100, 20);
+    std::string values_path = "temp_values.txt";
+    std::string keys_path = "temp_keys.txt";
+    generate_random_integers(values_path, -100, 100, 20);
+    generate_keys(keys_path, values_path);
     for (size_t table_size : {1, 2, 7, 11, 17, 23}) {
         test = new HashTable(table_size, bucket_type);
-        load_from_file(data_path, *test);
+        load_from_file(keys_path, values_path, *test);
 
         std::cout << "\n\n%%%%%%%%% Running unit tests: table_size=" << table_size 
                 << "; bucket_type=" << static_cast<int>(bucket_type) << " %%%%%%%%%\n";
@@ -77,7 +106,10 @@ void unit_tests(uint8_t bucket_type) {
         delete test;
     }
 
-    if (remove(data_path.c_str()) != 0) {
+    if (remove(values_path.c_str()) != 0) {
+        perror("Error deleting file");
+    }
+    if (remove(keys_path.c_str()) != 0) {
         perror("Error deleting file");
     }
 }
@@ -90,7 +122,8 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
     // TODO: @jubilanttae unit_test(JULKA1) i unit_test(JULKA2)
     // zamiana JULKA1 i JULKA2 w enumie na coś sensownego po zrobieniu implementacji
 
-    std::string data_path = "temp.txt";
+    std::string values_path = "temp_values.txt";
+    std::string keys_path = "temp_keys.txt";
     HashTable *test;
     unsigned long long results[HT_COUNT][HT_METHODS_COUNT] = {{0, 0},
                                                               {0, 0},
@@ -115,15 +148,16 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         std::cout << "SIZE=" << SIZE << std::endl;
         for(uint8_t i = 1; i <= NUM_OF_TIMES; i++) {
             size_t HS_SIZE = SIZE / 10;
-            generate_random_integers(data_path, -10000, 10000, SIZE);
+            generate_random_integers(values_path, -10000, 10000, SIZE);
+            generate_keys(keys_path, values_path);
 
             test = new HashTable(HS_SIZE, AVL);
-            load_from_file(data_path, *test);
+            load_from_file(keys_path, values_path, *test);
             results[AVL][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
             test = new HashTable(HS_SIZE, AVL);
-            load_from_file(data_path, *test);
+            load_from_file(keys_path, values_path, *test);
             results[AVL][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
             delete test;
 
@@ -142,7 +176,10 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         }
     }
 
-    if (remove(data_path.c_str()) != 0) {
+    if (remove(values_path.c_str()) != 0) {
+        perror("Error deleting file");
+    }
+    if (remove(keys_path.c_str()) != 0) {
         perror("Error deleting file");
     }
 }
