@@ -5,7 +5,7 @@
 #include <cstdint> // uint8_t
 #include <iostream>
 
-// Implementation of the Hash Table Dictionary. Possible bucket_types: '0' (for AVL Tree)
+// Implementation of the Hash Table Dictionary. Possible bucket_types: '0' (for AVL Tree), '1' (for JULKA1), '2' (for JULKA2) @jubilanttae
 class HashTable {
 private:
     size_t table_size;

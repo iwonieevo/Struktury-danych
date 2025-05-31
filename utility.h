@@ -39,6 +39,21 @@ unsigned long long measure_time(ObjectType* object, MethodType method, Parameter
     return duration.count();
 }
 
+// Function that checks correctness of method execution
+template <typename ObjectType, typename MethodType, typename ExpectedType, typename... Parameters>
+bool assert(ObjectType* object, MethodType method, ExpectedType expected, Parameters... params) {
+    auto result = std::invoke(method, object, std::forward<Parameters>(params)...);
+    
+    if (result == expected) {
+        std::cout << "[PASSED] Method executed correctly.\n";
+        return true;
+    } else {
+        std::cerr << "[FAILED] Method execution failed.\n";
+        std::cerr << "Expected: " << expected << ", Actual: " << result << "\n";
+        return false;
+    }
+}
+
 // Self-implemented max function
 template <typename T>
 T max(T a, T b) {

@@ -112,7 +112,7 @@ AVLNode* AVLTree::remove_node(AVLNode* node, const std::string& key, int& remove
 }
 
 int AVLTree::remove(const std::string& key) {
-    int removed_value = NULL;
+    int removed_value = INT_MIN;
     root = remove_node(root, key, removed_value);
     return removed_value;
 }

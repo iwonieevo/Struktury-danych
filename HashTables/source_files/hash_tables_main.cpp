@@ -1,67 +1,148 @@
 #include "../headers/hash_tables_main.h"
 
-void unit_test(size_t table_size, uint8_t bucket_type) {
-    HashTable test(table_size, bucket_type);
-
-    std::cout << "\n\n%%%%%%%%% table_size=" << table_size << "; bucket_type=" << (int)(bucket_type) << std::endl;
-    auto temp = test.remove("???");
-    if (!temp) {
-        std::cout << "TEST: remove on empty HashTable -> PASSED\n";
-    }else {
-        std::cerr << "TEST: remove on empty HashTable -> FAILED\n";
+void load_from_file(const std::string& path, HashTable& dict) {
+    std::ifstream data(path);
+    if(!data.is_open()) {
+        std::cerr << "Error: couldn't open the file: " << path << std::endl;
         return;
     }
 
-    test.insert("abc", 4);
-    test.insert("def", -2);
-    test.insert("ghi", 7);
-    test.insert("ABC", 7);
-    test.insert("DEF", 0);
-    test.insert("GHI", 120);
-    test.insert("quite long key with spaces", 555);
-    test.insert(R"("!@#^()&\\")", -10);
+    std::random_device rd; // random seed
+    std::mt19937 gen(rd()); // generator
+    std::uniform_int_distribution<char> dist('a', 'z');
 
-    std::cout << "\n### PRINT #1 ###\n";
-    test.print();
-    std::cout << std::endl;
-
-    temp = test.remove("ABC");
-    if (temp == 7) {
-        std::cout << "TEST: remove an existing element from HashTable -> PASSED\n";
-    }else {
-        std::cerr << "TEST: remove an existing element from HashTable -> FAILED\n";
-        return;
+    int value;
+    std::string key;
+    while(data >> value) {
+        key = "";
+        for(uint8_t i = 0; i < 10; i++) {
+            key.push_back(dist(gen));
+        }
+        key.append(std::to_string(value));
+        dict.insert(key, value);
     }
-
-    test.insert("abc", 400);
-    temp = test.get("abc");
-    if (temp == 400) {
-        std::cout << "TEST: change value of the element in the HashTable and retrieve it's value with 'get' -> PASSED\n";
-    }else {
-        std::cerr << "TEST: change value of the element in the HashTable and retrieve it's value with 'get' -> FAILED\n";
-        return;
-    }
-
-    std::cout << "\n### PRINT #2 ###\n";
-    test.print();
-    std::cout << std::endl;
-
-    if (!test.get("NonExistentKey")) {
-        std::cout << "TEST: using 'get' with key not in the HashTable -> PASSED\n";
-    }else {
-        std::cerr << "TEST: using 'get' with key not in the HashTable -> FAILED\n";
-        return;
-    }
+    data.close();
 }
 
-// Function loading data into the Hash Table
-void load_from_file(const std::string& keys_path, const std::string& values_path, HashTable& dict) {
-    
+void unit_tests(uint8_t bucket_type) {
+    HashTable *test;
+    std::string data_path = "temp.txt";
+    generate_random_integers(data_path, -100, 100, 20);
+    for (size_t table_size : {1, 2, 7, 11, 17, 23}) {
+        test = new HashTable(table_size, bucket_type);
+        load_from_file(data_path, *test);
+
+        std::cout << "\n\n%%%%%%%%% Running unit tests: table_size=" << table_size 
+                << "; bucket_type=" << static_cast<int>(bucket_type) << " %%%%%%%%%\n";
+
+        // Test: Remove on empty HashTable
+        assert(test, &HashTable::remove, INT_MIN, "???");
+
+        // Insert test cases
+        test->insert("abc", 4);
+        test->insert("ABC", 7);
+
+        std::cout << "\n### PRINT #1 ###\n";
+        test->print();
+        std::cout << std::endl;
+
+        // Test: Remove an existing element
+        assert(test, &HashTable::remove, 7, "ABC");
+
+        // Test: Change value of an element and retrieve it
+        test->insert("abc", 400);
+        assert(test, &HashTable::get, 400, "abc");
+
+        std::cout << "\n### PRINT #2 ###\n";
+        test->print();
+        std::cout << std::endl;
+
+        // Test: Retrieve non-existent key
+        assert(test, &HashTable::get, INT_MIN, "NonExistentKey");
+
+        // Additional test cases
+        test->insert("new_key", 42);
+        assert(test, &HashTable::get, 42, "new_key");
+
+        test->insert("new_key", 84); // Overwrite value
+        assert(test, &HashTable::get, 84, "new_key");
+
+        assert(test, &HashTable::remove, 84, "new_key");
+        assert(test, &HashTable::get, INT_MIN, "new_key");
+
+        std::cout << "\n### FINAL PRINT ###\n";
+        test->print();
+        std::cout << "\n%%%%%%%%% Unit tests completed for table_size=" << table_size 
+                << "; bucket_type=" << static_cast<int>(bucket_type) << " %%%%%%%%%\n";
+        delete test;
+    }
+
+    if (remove(data_path.c_str()) != 0) {
+        perror("Error deleting file");
+    }
 }
 
 void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) {
-    unit_test(1, 0);
-    unit_test(10, 0);
-    unit_test(5, 0);
-    unit_test(3, 0);
+    std::cout << "Hash Tables main function executing...\n\n";
+    enum ENUM_HT : uint8_t {AVL, JULKA1, JULKA2, HT_COUNT};
+    enum ENUM_HT_METHODS : uint8_t {INSERT, REMOVE, HT_METHODS_COUNT};
+    unit_tests(AVL);
+    // TODO: @jubilanttae unit_test(JULKA1) i unit_test(JULKA2)
+    // zamiana JULKA1 i JULKA2 w enumie na coś sensownego po zrobieniu implementacji
+
+    std::string data_path = "temp.txt";
+    HashTable *test;
+    unsigned long long results[HT_COUNT][HT_METHODS_COUNT] = {{0, 0},
+                                                              {0, 0},
+                                                              {0, 0}};
+    std::ofstream files[HT_METHODS_COUNT];
+    std::string filenames[HT_METHODS_COUNT] = { 
+                                              "HashTables/results/insert.csv",
+                                              "HashTables/results/remove.csv"
+                                             };
+    for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {
+        files[i].open(filenames[i]);
+        if(!files[i]) {
+            std::cerr << "Error opening " << filenames[i] << std::endl;
+        }
+    }
+    for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {
+        files[i] << "SIZE;AVL;JULKA1;JULKA2" << std::endl;
+    }
+
+    std::cout << "#-----------------------------------#\nBegin timing methods\n#-----------------------------------#\n\n";
+    for(unsigned int SIZE : SIZES) {
+        std::cout << "SIZE=" << SIZE << std::endl;
+        for(uint8_t i = 1; i <= NUM_OF_TIMES; i++) {
+            size_t HS_SIZE = SIZE / 10;
+            generate_random_integers(data_path, -10000, 10000, SIZE);
+
+            test = new HashTable(HS_SIZE, AVL);
+            load_from_file(data_path, *test);
+            results[AVL][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
+            delete test;
+
+            test = new HashTable(HS_SIZE, AVL);
+            load_from_file(data_path, *test);
+            results[AVL][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
+            delete test;
+
+            // TODO: @jubilanttae dodanie pomiarów do implementacji JULKA1 i JULKA2
+        }
+
+
+        std::cout << "Saving output..." << std::endl;
+        for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {
+            files[i] << SIZE;
+            for(uint8_t j = 0; j < HT_COUNT; j++) {
+                files[i] << ";" << (results[j][i] / NUM_OF_TIMES);
+                results[j][i] = 0;
+            }
+            files[i] << std::endl;
+        }
+    }
+
+    if (remove(data_path.c_str()) != 0) {
+        perror("Error deleting file");
+    }
 }

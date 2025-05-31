@@ -1,6 +1,7 @@
 #include "../headers/HashTable.h"
 
-HashTable::HashTable(size_t size=10, uint8_t bucket_type=0) : table_size(size) {
+HashTable::HashTable(size_t size=1, uint8_t bucket_type=0) {
+    table_size = size ? size : 1;
     switch (bucket_type)
     {
     case 0:
@@ -8,9 +9,18 @@ HashTable::HashTable(size_t size=10, uint8_t bucket_type=0) : table_size(size) {
         for (size_t i = 0; i < size; i++)
             table[i] = new AVLTree();
         break;
-    
+    case 1:
+        table = new Bucket*[size];
+        for (size_t i = 0; i < size; i++)
+            table[i] = new AVLTree(); // TODO: @jubilanttae JULKA1
+        break;
+    case 2:
+        table = new Bucket*[size];
+        for (size_t i = 0; i < size; i++)
+            table[i] = new AVLTree(); // TODO: @jubilanttae JULKA1
+        break;  
     default:
-        std::cerr << "\nIncorrect BucketType used! Possible options:\n -'0' (AVL Tree)\n";
+        std::cerr << "\nIncorrect BucketType used! Possible options:\n -'0' (AVL Tree)\n -'1' (JULKA1)\n -'2' (JULKA2)\n"; // TODO: @jubilanttae JULKA1 i JULKA2
         break;
     }
 }
@@ -45,6 +55,6 @@ void HashTable::print(void) {
 }
 
 int HashTable::get(const std::string& key) {
-    return (table[hash(key)]->find(key)) ? table[hash(key)]->find(key)->value : NULL;
+    return (table[hash(key)]->find(key)) ? table[hash(key)]->find(key)->value : INT_MIN;
 }
 

@@ -26,7 +26,6 @@ void priority_queues_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM
     enum ENUM_PQ : uint8_t {BINARY_HEAP, LINKED_LIST, PQ_COUNT};
     enum ENUM_PQ_METHOD : uint8_t {INSERT_H, INSERT_L, EXTRACT_MAX, FIND_MAX, INCREASE_KEY, DECREASE_KEY, RETURN_SIZE, PQ_METHOD_COUNT};
 
-    unsigned long long result = 0;
     unsigned long long results[PQ_COUNT][PQ_METHOD_COUNT] = {{0, 0, 0, 0, 0, 0, 0},
                                                              {0, 0, 0, 0, 0, 0, 0}};
     std::ofstream files[PQ_METHOD_COUNT];
@@ -139,7 +138,7 @@ void priority_queues_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM
             delete original;
         }
 
-        // Saving mean and max times to output files
+        // Saving mean times to output files
         std::cout << "Saving output..." << std::endl;
         for(uint8_t i = 0; i < PQ_METHOD_COUNT; i++) {
             files[i] << SIZE;
