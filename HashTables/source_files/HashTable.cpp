@@ -1,6 +1,6 @@
 #include "../headers/HashTable.h"
 
-HashTable::HashTable(size_t size=1, uint8_t bucket_type=0) {
+HashTable::HashTable(size_t size, uint8_t bucket_type) {
     table_size = size ? size : 1;
     switch (bucket_type)
     {
@@ -12,15 +12,15 @@ HashTable::HashTable(size_t size=1, uint8_t bucket_type=0) {
     case 1:
         table = new Bucket*[size];
         for (size_t i = 0; i < size; i++)
-            table[i] = new AVLTree(); // TODO: @jubilanttae JULKA1
+            table[i] = new OpenAddressing(); // TODO: @jubilanttae JULKA1
         break;
     case 2:
         table = new Bucket*[size];
         for (size_t i = 0; i < size; i++)
-            table[i] = new AVLTree(); // TODO: @jubilanttae JULKA1
+            table[i] = new CuckooHashing(); // TODO: @jubilanttae JULKA2
         break;  
     default:
-        std::cerr << "\nIncorrect BucketType used! Possible options:\n -'0' (AVL Tree)\n -'1' (JULKA1)\n -'2' (JULKA2)\n"; // TODO: @jubilanttae JULKA1 i JULKA2
+        std::cerr << "\nIncorrect BucketType used! Possible options:\n -'0' (AVL Tree)\n -'1' (Open Addressing)\n -'2' (Cuckoo Hashing)\n"; // TODO: @jubilanttae JULKA1 i JULKA2
         break;
     }
 }

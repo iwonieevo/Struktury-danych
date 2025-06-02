@@ -14,7 +14,7 @@ void generate_keys(std::string& dest_path, std::string& values_path) {
     
     std::random_device rd; // random seed
     std::mt19937 gen(rd()); // generator
-    std::uniform_int_distribution<char> dist('a', 'z');
+    std::uniform_int_distribution<int> dist(static_cast<int>('a'), static_cast<int>('z'));
 
     int value;
     std::string key;
@@ -116,11 +116,12 @@ void unit_tests(uint8_t bucket_type) {
 
 void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) {
     std::cout << "Hash Tables main function executing...\n\n";
-    enum ENUM_HT : uint8_t {AVL, JULKA1, JULKA2, HT_COUNT};
+    enum ENUM_HT : uint8_t {AVL, OPEN_ADDRESSING, CUCKOO, HT_COUNT};
     enum ENUM_HT_METHODS : uint8_t {INSERT, REMOVE, HT_METHODS_COUNT};
     unit_tests(AVL);
+    unit_tests(OPEN_ADDRESSING);
+    unit_tests(CUCKOO);
     // TODO: @jubilanttae unit_test(JULKA1) i unit_test(JULKA2)
-    // zamiana JULKA1 i JULKA2 w enumie na coś sensownego po zrobieniu implementacji
 
     std::string values_path = "temp_values.txt";
     std::string keys_path = "temp_keys.txt";
@@ -140,7 +141,7 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         }
     }
     for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {
-        files[i] << "SIZE;AVL;JULKA1;JULKA2" << std::endl;
+        files[i] << "SIZE;AVL;OPEN_ADDRESSING;CUCKOO" << std::endl;
     }
 
     std::cout << "#-----------------------------------#\nBegin timing methods\n#-----------------------------------#\n\n";
@@ -161,9 +162,26 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
             results[AVL][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
             delete test;
 
-            // TODO: @jubilanttae dodanie pomiarów do implementacji JULKA1 i JULKA2
-        }
+            test = new HashTable(HS_SIZE, OPEN_ADDRESSING);
+            load_from_file(keys_path, values_path, *test);
+            results[OPEN_ADDRESSING][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
+            delete test;
 
+            test = new HashTable(HS_SIZE, OPEN_ADDRESSING);
+            load_from_file(keys_path, values_path, *test);
+            results[OPEN_ADDRESSING][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
+            delete test;
+
+            test = new HashTable(HS_SIZE, CUCKOO);
+            load_from_file(keys_path, values_path, *test);
+            results[CUCKOO][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
+            delete test;
+
+            test = new HashTable(HS_SIZE, CUCKOO);
+            load_from_file(keys_path, values_path, *test);
+            results[CUCKOO][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
+            delete test;
+        }
 
         std::cout << "Saving output..." << std::endl;
         for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {

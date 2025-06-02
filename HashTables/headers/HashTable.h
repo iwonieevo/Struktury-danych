@@ -1,11 +1,13 @@
 #pragma once
 #include "Bucket.h"
 #include "AVLTree.h"
+#include "OpenAddressing.h"
+#include "CuckooHashing.h"
 #include <string>
 #include <cstdint> // uint8_t
 #include <iostream>
 
-// Implementation of the Hash Table Dictionary. Possible bucket_types: '0' (for AVL Tree), '1' (for JULKA1), '2' (for JULKA2) @jubilanttae
+// Implementation of the Hash Table Dictionary. Possible bucket_types: '0' (for AVL Tree), '1' (for Open Addressing), '2' (for Cuckoo Hashing) @jubilanttae
 class HashTable {
 private:
     size_t table_size;
@@ -26,6 +28,6 @@ public:
     // Display the key-value pairs inside the dictionary
     void print(void);
 
-    HashTable(size_t size, uint8_t bucket_type);
+    HashTable(size_t size = 1, uint8_t bucket_type = 0);
     ~HashTable();
 };
