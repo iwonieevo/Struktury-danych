@@ -16,7 +16,7 @@ AVLTree::~AVLTree() {
     destroy(root);
 }
 
-size_t AVLTree::get_height(AVLNode* node) {
+size_t AVLTree::get_height(AVLNode* node) const {
     return node ? node->height : 0;
 }
 
@@ -38,7 +38,7 @@ AVLNode* AVLTree::rotate_left(AVLNode *node) {
     return temp;
 }
 
-int8_t AVLTree::balance_factor(AVLNode* node) {
+int8_t AVLTree::balance_factor(AVLNode* node) const {
     return node ? static_cast<int8_t>(get_height(node->left) - get_height(node->right)) : 0;
 }
 
@@ -117,7 +117,7 @@ int AVLTree::remove(const std::string& key) {
     return removed_value;
 }
 
-AVLNode* AVLTree::find_node(AVLNode* node, const std::string& key) {
+AVLNode* AVLTree::find_node(AVLNode* node, const std::string& key) const {
     if (!node) {
         return nullptr;
     }
@@ -130,11 +130,11 @@ AVLNode* AVLTree::find_node(AVLNode* node, const std::string& key) {
     }
 }
 
-Node* AVLTree::find(const std::string& key) {
+AVLNode* AVLTree::find(const std::string& key) const {
     return find_node(root, key);
 }
 
-void AVLTree::print_in_order(AVLNode* node) {
+void AVLTree::print_in_order(AVLNode* node) const {
     if (!node) {
         return;
     }
@@ -143,6 +143,6 @@ void AVLTree::print_in_order(AVLNode* node) {
     print_in_order(node->right);
 }
 
-void AVLTree::print(void) {
+void AVLTree::print(void) const {
     print_in_order(root);
 }

@@ -1,6 +1,6 @@
 #include "../headers/CuckooHashing.h"
 
-CuckooHashing::CuckooHashing(size_t initial_capacity) 
+CuckooHashing::CuckooHashing(size_t initial_capacity = 16) 
     : capacity(initial_capacity), size(0) {
     table1 = new CuckooNode*[capacity];
     table2 = new CuckooNode*[capacity];
@@ -94,7 +94,7 @@ void CuckooHashing::rehash() {
 }
 
 void CuckooHashing::insert(const std::string& key, int value) {
-    Node* existing = find(key);
+    CuckooNode* existing = find(key);
     if (existing) {
         existing->value = value;
         return;
@@ -129,7 +129,7 @@ int CuckooHashing::remove(const std::string& key) {
     return INT_MIN;
 }
 
-Node* CuckooHashing::find(const std::string& key) {
+CuckooNode* CuckooHashing::find(const std::string& key) const {
     size_t pos1 = hash1(key);
     if (table1[pos1]->isOccupied && table1[pos1]->key == key) {
         return table1[pos1];
@@ -143,14 +143,19 @@ Node* CuckooHashing::find(const std::string& key) {
     return nullptr;
 }
 
-void CuckooHashing::print(void) {
-    std::cout << "Table 1:" << std::endl;
+int CuckooHashing::get(const std::string& key) const {
+    CuckooNode* temp = find(key);
+    return (temp) ? temp->value : INT_MIN;
+}
+
+void CuckooHashing::print(void) const {
+    std::cout << "\n@@@ Table 1:" << std::endl;
     for (size_t i = 0; i < capacity; i++) {
         if (table1[i]->isOccupied) {
             std::cout << table1[i]->key << ": " << table1[i]->value << std::endl;
         }
     }
-    std::cout << "Table 2:" << std::endl;
+    std::cout << "\n@@@ Table 2:" << std::endl;
     for (size_t i = 0; i < capacity; i++) {
         if (table2[i]->isOccupied) {
             std::cout << table2[i]->key << ": " << table2[i]->value << std::endl;

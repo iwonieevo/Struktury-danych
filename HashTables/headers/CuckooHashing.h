@@ -1,17 +1,17 @@
 #pragma once
-#include "Bucket.h"
-#include "utility.h"
-#include <iostream>
+#include "HashTable.h"
 #include <climits>
 
-struct CuckooNode : public Node {
+struct CuckooNode {
     bool isOccupied = false;
+    std::string key;
+    int value;
 
-    CuckooNode() : Node("", 0) {}
-    CuckooNode(const std::string& k, int v) : Node(k, v), isOccupied(true) {}
+    CuckooNode() : key(""), value(0) {}
+    CuckooNode(const std::string& k, int v) : key(k), value(v), isOccupied(true) {}
 };
 
-class CuckooHashing : public Bucket {
+class CuckooHashing : public HashTable {
 private:
     static const size_t MAX_REHASH_ATTEMPTS = 10;
     static const size_t MAX_LOOP_ITERATIONS = 100;
@@ -21,6 +21,7 @@ private:
     size_t capacity;
     size_t size;
 
+    CuckooNode* find(const std::string& key) const;
     size_t hash1(const std::string& key) const;
     size_t hash2(const std::string& key) const;
     void rehash();
@@ -28,11 +29,11 @@ private:
     bool insert_with_replacement(const std::string& key, int value, bool useFirstHash, size_t iterations = 0);
 
 public:
-    CuckooHashing(size_t initial_capacity = 16);
+    CuckooHashing(size_t initial_capacity);
     ~CuckooHashing();
 
     void insert(const std::string& key, int value) override;
     int remove(const std::string& key) override;
-    Node* find(const std::string& key) override;
-    void print(void) override;
+    int get(const std::string& key) const override;
+    void print(void) const override;
 };

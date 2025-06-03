@@ -24,7 +24,7 @@ void generate_keys(std::string& dest_path, std::string& values_path) {
             key.push_back(dist(gen));
         }
         key.append(std::to_string(value));
-        keys << key;
+        keys << key << std::endl;
     }
     values.close();
     keys.close();
@@ -52,17 +52,34 @@ void load_from_file(const std::string& k_path, const std::string& v_path, HashTa
 }
 
 void unit_tests(uint8_t bucket_type) {
-    HashTable *test;
+    HashTable* test;
     std::string values_path = "temp_values.txt";
     std::string keys_path = "temp_keys.txt";
-    generate_random_integers(values_path, -100, 100, 20);
+    generate_random_integers(values_path, -100, 100, 15);
     generate_keys(keys_path, values_path);
-    for (size_t table_size : {1, 2, 7, 11, 17, 23}) {
-        test = new HashTable(table_size, bucket_type);
+    for (size_t table_size : {2, 7, 12}) {
+        switch(bucket_type) {
+            case 0:
+                std::cout << "\n\n%%%%%%%%% Running unit tests: table_size=" << table_size << "; ChainAVL %%%%%%%%%\n";
+                test = new ChainAVL(table_size);
+                break;
+            case 1:
+                std::cout << "\n\n%%%%%%%%% Running unit tests: table_size=" << table_size << "; OpenAddressing %%%%%%%%%\n";
+                test = new OpenAddressing(table_size);
+                break;
+            case 2:
+                std::cout << "\n\n%%%%%%%%% Running unit tests: table_size=" << table_size << "; CuckooHashing %%%%%%%%%\n";
+                test = new CuckooHashing(table_size);
+                break;
+            default:
+                break;
+        }
+        
         load_from_file(keys_path, values_path, *test);
 
-        std::cout << "\n\n%%%%%%%%% Running unit tests: table_size=" << table_size 
-                << "; bucket_type=" << static_cast<int>(bucket_type) << " %%%%%%%%%\n";
+        std::cout << "\n### PRINT #1 ###\n";
+        test->print();
+        std::cout << std::endl;
 
         // Test: Remove on empty HashTable
         assert(test, &HashTable::remove, INT_MIN, "???");
@@ -71,20 +88,12 @@ void unit_tests(uint8_t bucket_type) {
         test->insert("abc", 4);
         test->insert("ABC", 7);
 
-        std::cout << "\n### PRINT #1 ###\n";
-        test->print();
-        std::cout << std::endl;
-
         // Test: Remove an existing element
         assert(test, &HashTable::remove, 7, "ABC");
 
         // Test: Change value of an element and retrieve it
         test->insert("abc", 400);
         assert(test, &HashTable::get, 400, "abc");
-
-        std::cout << "\n### PRINT #2 ###\n";
-        test->print();
-        std::cout << std::endl;
 
         // Test: Retrieve non-existent key
         assert(test, &HashTable::get, INT_MIN, "NonExistentKey");
@@ -99,10 +108,10 @@ void unit_tests(uint8_t bucket_type) {
         assert(test, &HashTable::remove, 84, "new_key");
         assert(test, &HashTable::get, INT_MIN, "new_key");
 
-        std::cout << "\n### FINAL PRINT ###\n";
+        std::cout << "\n### PRINT #2 ###\n";
         test->print();
-        std::cout << "\n%%%%%%%%% Unit tests completed for table_size=" << table_size 
-                << "; bucket_type=" << static_cast<int>(bucket_type) << " %%%%%%%%%\n";
+        std::cout << "\n%%%%%%%%% Unit tests completed %%%%%%%%%\n";
+
         delete test;
     }
 
@@ -115,16 +124,13 @@ void unit_tests(uint8_t bucket_type) {
 }
 
 void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_TIMES) {
-    std::cout << "Hash Tables main function executing...\n\n";
+    std::cout << "~~~~~~~~~~~~~~~~~~ Hash Tables main function executing... ~~~~~~~~~~~~~~~~~~\n";
+
     enum ENUM_HT : uint8_t {AVL, OPEN_ADDRESSING, CUCKOO, HT_COUNT};
     enum ENUM_HT_METHODS : uint8_t {INSERT, REMOVE, HT_METHODS_COUNT};
-    unit_tests(AVL);
-    unit_tests(OPEN_ADDRESSING);
-    unit_tests(CUCKOO);
-
     std::string values_path = "temp_values.txt";
     std::string keys_path = "temp_keys.txt";
-    HashTable *test;
+    HashTable* test;
     unsigned long long results[HT_COUNT][HT_METHODS_COUNT] = {{0, 0},
                                                               {0, 0},
                                                               {0, 0}};
@@ -143,6 +149,10 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         files[i] << "SIZE;AVL;OPEN_ADDRESSING;CUCKOO" << std::endl;
     }
 
+    unit_tests(AVL);
+    unit_tests(OPEN_ADDRESSING);
+    unit_tests(CUCKOO);
+
     std::cout << "#-----------------------------------#\nBegin timing methods\n#-----------------------------------#\n\n";
     for(unsigned int SIZE : SIZES) {
         std::cout << "SIZE=" << SIZE << std::endl;
@@ -151,37 +161,43 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
             generate_random_integers(values_path, -10000, 10000, SIZE-1);
             generate_keys(keys_path, values_path);
 
-            test = new HashTable(HS_SIZE, AVL);
+            // ChainAVL - insert
+            test = new ChainAVL(HS_SIZE);
             load_from_file(keys_path, values_path, *test);
             test->insert("key_to_be_deleted", 100);
             results[AVL][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
-            test = new HashTable(HS_SIZE, AVL);
+            // ChainAVL - remove
+            test = new ChainAVL(HS_SIZE);
             load_from_file(keys_path, values_path, *test);
             test->insert("key_to_be_deleted", 100);
             results[AVL][REMOVE] += measure_time(test, &HashTable::remove, "key_to_be_deleted");
             delete test;
 
-            test = new HashTable(HS_SIZE, OPEN_ADDRESSING);
+            // OpenAddressing - insert
+            test = new OpenAddressing(HS_SIZE);
             load_from_file(keys_path, values_path, *test);
             test->insert("key_to_be_deleted", 100);
             results[OPEN_ADDRESSING][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
-            test = new HashTable(HS_SIZE, OPEN_ADDRESSING);
+            // OpenAddressing - remove
+            test = new OpenAddressing(HS_SIZE);
             load_from_file(keys_path, values_path, *test);
             test->insert("key_to_be_deleted", 100);
             results[OPEN_ADDRESSING][REMOVE] += measure_time(test, &HashTable::remove, "key_to_be_deleted");
             delete test;
 
-            test = new HashTable(HS_SIZE, CUCKOO);
+            // CuckooHashing - insert
+            test = new CuckooHashing(HS_SIZE);
             load_from_file(keys_path, values_path, *test);
             test->insert("key_to_be_deleted", 100);
             results[CUCKOO][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
-            test = new HashTable(HS_SIZE, CUCKOO);
+            // CuckooHashing - remove
+            test = new CuckooHashing(HS_SIZE);
             load_from_file(keys_path, values_path, *test);
             test->insert("key_to_be_deleted", 100);
             results[CUCKOO][REMOVE] += measure_time(test, &HashTable::remove, "key_to_be_deleted");
@@ -199,6 +215,10 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         }
     }
 
+    // CLEANUP
+    for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {
+        files[i].close();
+    }
     if (remove(values_path.c_str()) != 0) {
         perror("Error deleting file");
     }

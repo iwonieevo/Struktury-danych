@@ -1,7 +1,7 @@
 #include "../headers/OpenAddressing.h"
 #include <climits>
 
-OpenAddressing::OpenAddressing(size_t initial_capacity)
+OpenAddressing::OpenAddressing(size_t initial_capacity = 16)
     : capacity(initial_capacity), size(0) {
     table = new OpenAddressingNode*[capacity];
     for (size_t i = 0; i < capacity; i++) {
@@ -28,23 +28,6 @@ size_t OpenAddressing::hash(const std::string& key) const {
         hash_value = (hash_value * 31 + c) % capacity;
     }
     return hash_value;
-}
-
-OpenAddressingNode* OpenAddressing::find_node(const std::string& key) const {
-    size_t index = hash(key);
-    size_t original = index;
-
-    do {
-        if (table[index] == nullptr) {
-            return nullptr;
-        }
-        if (!table[index]->isDeleted && table[index]->key == key) {
-            return table[index];
-        }
-        index = (index + 1) % capacity;
-    } while (index != original);
-
-    return nullptr;
 }
 
 void OpenAddressing::resize() {
@@ -123,11 +106,30 @@ int OpenAddressing::remove(const std::string& key) {
     return INT_MIN;
 }
 
-Node* OpenAddressing::find(const std::string& key) {
-    return find_node(key);
+OpenAddressingNode* OpenAddressing::find(const std::string& key) const {
+    size_t index = hash(key);
+    size_t original = index;
+
+    do {
+        if (table[index] == nullptr) {
+            return nullptr;
+        }
+        if (!table[index]->isDeleted && table[index]->key == key) {
+            return table[index];
+        }
+        index = (index + 1) % capacity;
+    } while (index != original);
+
+    return nullptr;
 }
 
-void OpenAddressing::print(void) {
+int OpenAddressing::get(const std::string& key) const {
+    OpenAddressingNode* temp = find(key);
+    return (temp) ? temp->value : INT_MIN;
+}
+
+void OpenAddressing::print(void) const {
+    std::cout << std::endl;
     for (size_t i = 0; i < capacity; i++) {
         if (table[i] != nullptr && !table[i]->isDeleted) {
             std::cout << table[i]->key << ": " << table[i]->value << std::endl;

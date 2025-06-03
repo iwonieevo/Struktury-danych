@@ -1,37 +1,39 @@
 #pragma once
-#include "Bucket.h"
 #include "utility.h"
+#include <string>
 #include <iostream>
 
-struct AVLNode : public Node {
+struct AVLNode {
+    std::string key;
+    int value;
     AVLNode* left = nullptr;
     AVLNode* right = nullptr;
     size_t height = 1;
 
-    AVLNode(const std::string& k, int v) : Node(k, v) {}
+    AVLNode(const std::string& k, int v) : key(k), value(v) {}
 };
 
-class AVLTree : public Bucket {
+class AVLTree {
 private:
     AVLNode* root = nullptr;
 
     void destroy(AVLNode *node);
-    size_t get_height(AVLNode *node);
+    size_t get_height(AVLNode *node) const;
     AVLNode* rotate_right(AVLNode *node);
     AVLNode* rotate_left(AVLNode *node);
-    int8_t balance_factor(AVLNode *node);
+    int8_t balance_factor(AVLNode *node) const;
     AVLNode* balance_tree(AVLNode *node);
     AVLNode* insert_node(AVLNode* node, const std::string& key, int value);
     AVLNode* remove_node(AVLNode* node, const std::string& key, int& removed_value);
-    AVLNode* find_node(AVLNode* node, const std::string& key);
-    void print_in_order(AVLNode* node);
+    AVLNode* find_node(AVLNode* node, const std::string& key) const;
+    void print_in_order(AVLNode* node) const;
 
 public:
     AVLTree();
     ~AVLTree();
 
-    void insert(const std::string& key, int value) override;
-    int remove(const std::string& key) override;
-    Node* find(const std::string& key) override;
-    void print(void) override;
+    void insert(const std::string& key, int value);
+    int remove(const std::string& key);
+    AVLNode* find(const std::string& key) const;
+    void print(void) const;
 };
