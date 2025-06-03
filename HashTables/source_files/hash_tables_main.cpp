@@ -121,7 +121,6 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
     unit_tests(AVL);
     unit_tests(OPEN_ADDRESSING);
     unit_tests(CUCKOO);
-    // TODO: @jubilanttae unit_test(JULKA1) i unit_test(JULKA2)
 
     std::string values_path = "temp_values.txt";
     std::string keys_path = "temp_keys.txt";
@@ -149,37 +148,43 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         std::cout << "SIZE=" << SIZE << std::endl;
         for(uint8_t i = 1; i <= NUM_OF_TIMES; i++) {
             size_t HS_SIZE = SIZE / 10;
-            generate_random_integers(values_path, -10000, 10000, SIZE);
+            generate_random_integers(values_path, -10000, 10000, SIZE-1);
             generate_keys(keys_path, values_path);
 
             test = new HashTable(HS_SIZE, AVL);
             load_from_file(keys_path, values_path, *test);
+            test->insert("key_to_be_deleted", 100);
             results[AVL][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
             test = new HashTable(HS_SIZE, AVL);
             load_from_file(keys_path, values_path, *test);
-            results[AVL][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
+            test->insert("key_to_be_deleted", 100);
+            results[AVL][REMOVE] += measure_time(test, &HashTable::remove, "key_to_be_deleted");
             delete test;
 
             test = new HashTable(HS_SIZE, OPEN_ADDRESSING);
             load_from_file(keys_path, values_path, *test);
+            test->insert("key_to_be_deleted", 100);
             results[OPEN_ADDRESSING][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
             test = new HashTable(HS_SIZE, OPEN_ADDRESSING);
             load_from_file(keys_path, values_path, *test);
-            results[OPEN_ADDRESSING][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
+            test->insert("key_to_be_deleted", 100);
+            results[OPEN_ADDRESSING][REMOVE] += measure_time(test, &HashTable::remove, "key_to_be_deleted");
             delete test;
 
             test = new HashTable(HS_SIZE, CUCKOO);
             load_from_file(keys_path, values_path, *test);
+            test->insert("key_to_be_deleted", 100);
             results[CUCKOO][INSERT] += measure_time(test, &HashTable::insert, "definetely_unique_key", 10000);
             delete test;
 
             test = new HashTable(HS_SIZE, CUCKOO);
             load_from_file(keys_path, values_path, *test);
-            results[CUCKOO][REMOVE] += measure_time(test, &HashTable::remove, "aaa");
+            test->insert("key_to_be_deleted", 100);
+            results[CUCKOO][REMOVE] += measure_time(test, &HashTable::remove, "key_to_be_deleted");
             delete test;
         }
 

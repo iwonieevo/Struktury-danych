@@ -35,19 +35,4 @@ public:
     int remove(const std::string& key) override;
     Node* find(const std::string& key) override;
     void print(void) override;
-
-    // Helper methods using utility.h
-    template<typename... Parameters>
-    unsigned long long measure_operation_time(void (CuckooHashing::*method)(const std::string&, int), Parameters... params) {
-        return measure_time(this, method, std::forward<Parameters>(params)...);
-    }
-
-    template<typename ExpectedType, typename... Parameters>
-    bool assert_operation(int (CuckooHashing::*method)(const std::string&), ExpectedType expected, Parameters... params) {
-        return assert(this, method, expected, std::forward<Parameters>(params)...);
-    }
-
-    // Getters for testing
-    size_t get_size() const { return size; }
-    size_t get_capacity() const { return capacity; }
 };
