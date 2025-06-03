@@ -146,7 +146,7 @@ void hash_tables_main(std::initializer_list<unsigned int> SIZES, uint8_t NUM_OF_
         }
     }
     for(uint8_t i = 0; i < HT_METHODS_COUNT; i++) {
-        files[i] << "SIZE;AVL;OPEN_ADDRESSING;CUCKOO" << std::endl;
+        files[i] << "SIZE;ChainAVL;OpenAddressing;CuckooHashing" << std::endl;
     }
 
     unit_tests(AVL);
